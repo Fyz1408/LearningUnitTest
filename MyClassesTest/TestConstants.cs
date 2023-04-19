@@ -11,5 +11,6 @@ namespace MyClassesTest
         public const string GOOD_FILE_NAME = @"C:\Windows\Regedit.exe";
         public const string BAD_FILE_NAME = @"C:\NotExists.txt";
         public const string EMPTY_FILE_FAIL_MSG = "The call to the FileExists() method NOT throw an ArgumentNullException and it SHOULD have";
+        public const string EMPTY_FILE_MSG = "Checking for an empty file name.";
     }
 }
