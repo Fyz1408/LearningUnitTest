@@ -1,15 +1,14 @@
-﻿namespace MyClasses
-{
-    public class FileProcess
-    {
-        public bool FileExits(string fileName)
-        {
+﻿namespace MyClasses;
 
-            if (string.IsNullOrEmpty(fileName))
-            {
-                throw new ArgumentNullException(nameof(fileName));
-            }
-            return File.Exists(fileName);
+public class FileProcess
+{
+    public bool FileExists(string fileName)
+    {
+        if (string.IsNullOrEmpty(fileName))
+        {
+            throw new ArgumentNullException(nameof(fileName));
         }
+
+        return File.Exists(fileName);
     }
 }

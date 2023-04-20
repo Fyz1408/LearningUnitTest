@@ -3,90 +3,103 @@ using MyClasses;
 namespace MyClassesTest;
 
     [TestClass]
-    public class FileProcessTest
+public class FileProcessTest : TestBase
+{
+    [TestMethod]
+    public void FileNameDoesExist()
     {
-        public TestContext? TestContext { get; set; }
-        
-        [TestMethod]
-        public void FileNameDoesExist()
-        {
         // Arrange
         FileProcess fp = new();
-        string fileName = TestConstants.GOOD_FILE_NAME;
         bool fromCall;
-        
-        // Add messages to testoutput
-        TestContext.WriteLine($"Checking for file '{TestConstants.GOOD_FILE_NAME}'");
+
+        // Add Messages to Test Output
+        string fileName = GetTestSetting<string>("GoodFileName", TestConstants.GOOD_FILE_NAME);
+        fileName = fileName.Replace("[AppDataPath]", Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData));
+        TestContext?.WriteLine($"Checking for file: '{fileName}'");
+
+        // Create the Good File
+        File.AppendAllText(fileName, "Some Text");
 
         // Act
-        fromCall = fp.FileExits(fileName);
+        fromCall = fp.FileExists(fileName);
+
+        // Delete the Good File if it Exists
+        if (File.Exists(fileName))
+        {
+            File.Delete(fileName);
+        }
 
         // Assert
         Assert.IsTrue(fromCall);
+    }
 
-        }
-
-        [TestMethod]
-        public void FileNameDoesNotExist()
-        {
+    [TestMethod]
+    public void FileNameDoesNotExist()
+    {
         // Arrange
         FileProcess fp = new();
-        string fileName = TestConstants.BAD_FILE_NAME;
         bool fromCall;
 
-        // Add messages to testoutput
-        TestContext.WriteLine($"Checking for file '{TestConstants.BAD_FILE_NAME}'");
+        // Add Messages to Test Output
+        string fileName = GetTestSetting<string>("BadFileName", TestConstants.BAD_FILE_NAME);
+        TestContext?.WriteLine($"Checking file '{fileName}' does NOT exist.");
 
         // Act
-        fromCall = fp.FileExits(fileName);
+        fromCall = fp.FileExists(fileName);
 
         // Assert
         Assert.IsFalse(fromCall);
-
     }
-        [TestMethod]
-        public void FileNameNullOrEmpty_UsingTryCatch_ShouldThrowArgumentNullException()
-        {
+
+    [TestMethod]
+    public void FileNameNullOrEmpty_UsingTryCatch_ShouldThrowArgumentNullException()
+    {
         // Arrange
         FileProcess fp;
         string fileName = string.Empty;
-        //string fileName = @"C:\Windows\Regedit.exe";
         bool fromCall = false;
+
+        // Add Messages to Test Output
+        OutputMessage = GetTestSetting<string>("EmptyFileMsg", TestConstants.EMPTY_FILE_MSG);
+        TestContext?.WriteLine(OutputMessage);
 
         try
         {
             // Act
             fp = new();
 
-            // Add messages to testoutput
-            TestContext.WriteLine($"Checking for file '{TestConstants.EMPTY_FILE_MSG}'");
+            fromCall = fp.FileExists(fileName);
 
-            fromCall = fp.FileExits(fileName);
-
-            // Assert
-            Assert.Fail(TestConstants.EMPTY_FILE_FAIL_MSG);
+            // Assert: Fail because we should not get here
+            OutputMessage = GetTestSetting<string>("EmptyFileFailMsg", TestConstants.EMPTY_FILE_FAIL_MSG);
+            Assert.Fail(OutputMessage);
         }
-           catch (ArgumentNullException) { 
-            // Assert
-            Assert.IsFalse(fromCall); 
-        }
-        }
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void FileNameNullOrEmpty_UsingExpectedExceptionAttribute()
+        catch (ArgumentNullException)
         {
+            // Assert: Test was a success
+            Assert.IsFalse(fromCall);
+        }
+    }
+
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentNullException))]
+    public void FileNameNullOrEmpty_UsingExpectedExceptionAttribute()
+    {
         // Arrange
         FileProcess fp = new();
         string fileName = string.Empty;
+        //string fileName = "Test";  // Uncomment to test failure
         bool fromCall;
 
-        // Add messages to testoutput
-        TestContext.WriteLine($"Checking for file '{TestConstants.EMPTY_FILE_MSG}'");
+        // Add Messages to Test Output
+        OutputMessage = GetTestSetting<string>("EmptyFileMsg", TestConstants.EMPTY_FILE_MSG);
+        TestContext?.WriteLine(OutputMessage);
 
         // Act
-        fromCall = fp.FileExits(fileName);
+        fromCall = fp.FileExists(fileName);
 
-        // Assert
-        Assert.Fail(TestConstants.EMPTY_FILE_FAIL_MSG);
-        }
+        // Assert: Fail because we should not get here
+        OutputMessage = GetTestSetting<string>("EmptyFileFailMsg", TestConstants.EMPTY_FILE_FAIL_MSG);
+        Assert.Fail(OutputMessage);
     }
+}
